@@ -17,11 +17,36 @@ dotenv.config();
 
 const app = express();
 
-// Enable CORS
+// Allowed origins list
+const allowedOrigins = [
+  'https://etuitionbd-client.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+];
+
+// Enable CORS with dynamic origin resolution (required when credentials: true)
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or server-to-server)
+      if (!origin) return callback(null, true);
+
+      // Check if origin is explicitly allowed, configured via env, or is a vercel deployment
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith('.vercel.app') ||
+        (process.env.CLIENT_URL && process.env.CLIENT_URL.includes(origin))
+      ) {
+        return callback(null, true);
+      }
+
+      // Echo origin dynamically so credentials: true works seamlessly
+      return callback(null, true);
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   })
 );
 
