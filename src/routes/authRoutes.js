@@ -1,5 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import admin from 'firebase-admin';
 import { User } from '../models/User.js';
 import { verifyToken } from '../middleware/auth.js';
 
@@ -9,12 +10,12 @@ const router = express.Router();
 const setFirebaseCustomClaims = async (uid, role) => {
   if (!uid || !role) return;
   try {
-    const adminModule = await import('firebase-admin');
-    if (adminModule.default && adminModule.default.apps && adminModule.default.apps.length > 0) {
-      await adminModule.default.auth().setCustomUserClaims(uid, { role });
+    if (admin.apps && admin.apps.length > 0) {
+      await admin.auth().setCustomUserClaims(uid, { role });
     }
   } catch (err) {
-    // Non-blocking: skip if firebase admin is not active in environment
+    // Non-blocking: skip if firebase admin claim setting fails
+    console.warn('Firebase custom claims setting skipped:', err.message);
   }
 };
 
