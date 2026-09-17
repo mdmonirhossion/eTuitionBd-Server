@@ -9,3 +9,6 @@ yarn-error.log*
 *-firebase-adminsdk-*.json
 firebase-admin-service-key.json
 
+
+.vercel
+.env*

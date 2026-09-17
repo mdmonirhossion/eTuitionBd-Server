@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import tuitionRoutes from './routes/tuitionRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
@@ -25,6 +27,18 @@ app.use(
 
 // JSON body parser
 app.use(express.json());
+
+// Ensure Database is connected for Serverless Functions (Vercel)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.error('Failed to connect DB in serverless middleware:', err);
+    }
+  }
+  next();
+});
 
 // Root Health Check Route
 app.get('/', (req, res) => {
