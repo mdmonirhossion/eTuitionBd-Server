@@ -144,7 +144,7 @@ router.post('/', verifyToken, verifyStudent, async (req, res, next) => {
       daysPerWeek: Number(daysPerWeek) || 3,
       schedule: schedule || 'Evening',
       description: description || '',
-      status: 'approved',
+      status: 'pending',
     });
 
     res.status(201).json(tuition);
